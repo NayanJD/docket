@@ -2,14 +2,14 @@ package models
 
 import (
 	"github.com/rs/zerolog/log"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	database, err := gorm.Open(postgres.Open("postgres://go:password@localhost:5432/docket_local"), &gorm.Config{})
+	database, err := gorm.Open(mysql.Open("go:password@tcp(127.0.0.1:3306)/docket_local"), &gorm.Config{})
 
 	if err != nil {
 		panic("Failed to connect to postgres")
