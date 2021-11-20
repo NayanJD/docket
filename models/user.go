@@ -10,7 +10,7 @@ type User struct {
 	ID string
 	First_name string	
 	Last_name string 	`gorm:"not null"`
-	Email string		`gorm:"unique"`
+	Email string		
 }
 
 func (u * User) BeforeCreate(tx *gorm.DB)  (err error) {
