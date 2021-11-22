@@ -5,6 +5,7 @@ import (
 
 	ginzerolog "github.com/dn365/gin-zerolog"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
@@ -12,6 +13,11 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Warn().Msg("Error loading .env")
+	}
 	r := gin.New()
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
