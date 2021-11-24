@@ -1,25 +1,18 @@
 package models
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"nayanjd/docket/utils"
 )
 
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
 
-	username := os.Getenv("DB_USERNAME")
-	password := os.Getenv("DB_PASSWORD")
-	database_name := os.Getenv("DB_DATABASE")
-
-	mysqlDsn := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", username, password, host, port, database_name)
+	mysqlDsn := utils.GetMysqlDsn()
 
 	database, err := gorm.Open(mysql.Open(mysqlDsn), &gorm.Config{})
 
