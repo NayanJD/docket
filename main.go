@@ -10,8 +10,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	_ "github.com/go-sql-driver/mysql"
-
 	"nayanjd/docket/models"
 	"nayanjd/docket/utils"
 )
@@ -30,7 +28,6 @@ func main() {
 	models.ConnectDatabase()
 
 	
-
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "Welcome to docket",
