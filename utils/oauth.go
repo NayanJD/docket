@@ -8,9 +8,10 @@ import (
 	oauthModels "github.com/go-oauth2/oauth2/v4/models"
 	"github.com/go-oauth2/oauth2/v4/server"
 	"github.com/go-oauth2/oauth2/v4/store"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/rs/zerolog/log"
 
-	"github.com/go-oauth2/mysql/v4"
+	mysql "github.com/go-oauth2/mysql/v4"
 )
 
 func SetupOauth() *server.Server {

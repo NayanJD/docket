@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"os"
 
 	ginzerolog "github.com/dn365/gin-zerolog"
@@ -10,8 +9,8 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
+	"nayanjd/docket/controllers"
 	"nayanjd/docket/models"
-	"nayanjd/docket/utils"
 )
 
 func main() {
@@ -34,27 +33,13 @@ func main() {
 		})
 	})
 
-	srv := utils.SetupOauth()
+	oauthController := controllers.OauthController{}
 	
 	oauthEndpoints := r.Group("oauth")
 	{
-		oauthEndpoints.POST("/token", func(c *gin.Context) {
-			err := srv.HandleTokenRequest(c.Writer, c.Request)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"message": "Wrong password",
-				})
-			}
-		})
+		oauthEndpoints.POST("/token", oauthController.TokenHandler)
 
-		oauthEndpoints.POST("/authorize", func(c *gin.Context) {
-			err := srv.HandleAuthorizeRequest(c.Writer, c.Request)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"message": "Wrong password",
-				})
-			}
-		})
+		oauthEndpoints.POST("/authorize", oauthController.AuthorizeHandler)
 	}
 
 	log.Printf("Server stopped, err: %v", r.Run(":8000"))
