@@ -28,3 +28,17 @@ func (ctrl OauthController) AuthorizeHandler(c *gin.Context) {
 		})
 	}
 }
+
+func (ctrl OauthController) TestHandler(c *gin.Context) {
+	_, err := Srv.ValidationBearerToken(c.Request)
+	
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "You are unauthorised to view this resource",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"message": "Test resource"})
+	}
+
+}
+
