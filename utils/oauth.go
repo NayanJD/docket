@@ -5,36 +5,31 @@ import (
 
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/manage"
-	oauthModels "github.com/go-oauth2/oauth2/v4/models"
 	"github.com/go-oauth2/oauth2/v4/server"
-	"github.com/go-oauth2/oauth2/v4/store"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/rs/zerolog/log"
 
-	mysql "github.com/go-oauth2/mysql/v4"
+	oauthMysqlStore "github.com/go-oauth2/mysql/v4"
+
+	"nayanjd/docket/models"
 )
 
 func SetupOauth() *server.Server {
 	manager := manage.NewDefaultManager()
 	
 	// use mysql token store
-	mysqlStore := mysql.NewDefaultStore(
-		mysql.NewConfig(GetMysqlDsn()),
+	mysqlStore := oauthMysqlStore.NewDefaultStore(
+		oauthMysqlStore.NewConfig(GetMysqlDsn()),
 	)
+	clientStore, _ := models.NewClientStore(models.DB)
 
 	manager.MapTokenStorage(mysqlStore)
-	// manager.MapClientStorage(clientStore)
-
-	// client memory store
-	clientStore := store.NewClientStore()
-	clientStore.Set("000000", &oauthModels.Client{
-		ID:     "000000",
-		Secret: "999999",
-	})
 	manager.MapClientStorage(clientStore)
 
 	srv := server.NewDefaultServer(manager)
+	
 	// srv.SetAllowGetAccessRequest(true)
+	
 	srv.SetClientInfoHandler(server.ClientFormHandler)
 
 	srv.SetPasswordAuthorizationHandler(func(username, password string) (userID string, err error) {
