@@ -11,10 +11,10 @@ import (
 
 
 
-func main() {
-	name := flag.String("name", "client", "Client name for the new client")
+func CreateOauthClient(flagSet *flag.FlagSet, commands []string) {
+	name := flagSet.String("name", "client", "Client name for the new client")
 
-	flag.Parse()
+	flagSet.Parse(commands)
 
 	newClient := models.ClientStoreItem{
 		Name: *name,

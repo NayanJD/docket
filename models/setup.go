@@ -46,7 +46,5 @@ func ConnectDatabase() {
 		log.Error().Err(err)
 	}
 
-	// database.Migrator().AddColumn(&ClientStoreItem{}, "name")
-
 	DB = database
 }
