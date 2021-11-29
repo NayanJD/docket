@@ -33,10 +33,15 @@ func SetupOauth() *server.Server {
 	srv.SetClientInfoHandler(server.ClientFormHandler)
 
 	srv.SetPasswordAuthorizationHandler(func(username, password string) (userID string, err error) {
-		if username == "test" && password == "test" {
-			userID = "test"
+		user := &models.User{}
+
+		err = models.GetDB().First(user, "username = ?", username).Error
+
+		if err == nil && user.ComparePassword(&password) {
+			userID = *user.ID
 		}
-		return userID, nil
+
+		return userID , nil
 	})
 
 	srv.SetInternalErrorHandler(func(err error) (re *errors.Response) {
