@@ -25,6 +25,7 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	r.Use(ginzerolog.Logger("gin"))
 	r.Use(middlewares.ErrorMiddleware())
+	r.Use(gin.CustomRecovery(middlewares.RecoveryFunc))
 
 	models.ConnectDatabase()
 
@@ -43,7 +44,7 @@ func main() {
 
 		oauthEndpoints.POST("/authorize", oauthController.AuthorizeHandler)
 
-		oauthEndpoints.GET("/test", oauthController.TestHandler)
+		oauthEndpoints.GET("/test", oauthController.TokenMiddleware(), oauthController.TestHandler)
 	}
 	
 	log.Printf("Server stopped, err: %v", r.Run(":8000"))
