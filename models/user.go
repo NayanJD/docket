@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"net/mail"
 
 	"github.com/google/uuid"
@@ -18,6 +19,10 @@ type User struct {
 	Password		*string	`gorm:"not null"`
 	Is_superuser	*bool	`gorm:"not null;default:false"`
 	Is_staff		*bool	`gorm:"not null;default:false"`
+}
+
+func (u *User) String() string {
+	return fmt.Sprintf("User: id=&v, username=%v", *u.ID, *u.Username)
 }
 
 func (u * User) BeforeCreate(tx *gorm.DB)  (err error) {

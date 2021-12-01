@@ -10,6 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"nayanjd/docket/controllers"
+	"nayanjd/docket/middlewares"
 	"nayanjd/docket/models"
 )
 
@@ -23,6 +24,7 @@ func main() {
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	r.Use(ginzerolog.Logger("gin"))
+	r.Use(middlewares.ErrorMiddleware())
 
 	models.ConnectDatabase()
 
@@ -43,6 +45,6 @@ func main() {
 
 		oauthEndpoints.GET("/test", oauthController.TestHandler)
 	}
-
+	
 	log.Printf("Server stopped, err: %v", r.Run(":8000"))
 }
