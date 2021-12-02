@@ -44,7 +44,7 @@ func main() {
 
 		oauthEndpoints.POST("/authorize", oauthController.AuthorizeHandler)
 
-		oauthEndpoints.GET("/test", oauthController.TokenMiddleware(), oauthController.TestHandler)
+		oauthEndpoints.GET("/test",oauthController.TokenMiddleware(),  oauthController.TestHandler)
 	}
 	
 	log.Printf("Server stopped, err: %v", r.Run(":8000"))

@@ -6,26 +6,51 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Response struct {
+	Http_code	int
+	Body		*gin.H
+	Meta		*gin.H
+}
+
 func IsStatusSuccess(code int) bool {
 	return code >= http.StatusOK && code < http.StatusMultipleChoices 
 }
 
-func AbortWithGenericJson(c *gin.Context, code int, obj interface{}) {
-	isSuccess := IsStatusSuccess(code)
+func CreateResponse(code int, body *gin.H, meta *gin.H) *Response {
+	return &Response{Http_code: code, Body: body, Meta: meta}
+}
 
-	if isSuccess {
-		c.AbortWithStatusJSON(code, gin.H{
-			"data": obj,
-			"errors": nil,
-			"isSuccess": true,
-			"meta": gin.H{},
+func CreateOKResponse(body *gin.H, meta *gin.H) *Response {
+	return CreateResponse(http.StatusOK, body, meta)
+}
+
+func AbortWithGenericJson(c *gin.Context, r *Response, err *APIError) {
+
+	if r != nil {
+		body := gin.H{}
+		if r.Body != nil {
+			body = *r.Body
+		}
+
+		meta := gin.H{}
+		if r.Meta != nil {
+			meta = *r.Meta
+		}
+
+		c.AbortWithStatusJSON(r.Http_code, gin.H{
+			"data": body,
+			"error": nil,
+			"isSuccess": IsStatusSuccess(r.Http_code),
+			"meta": meta,
 		})
 		return
-	} else {
-		c.AbortWithStatusJSON(code, gin.H{
+	} 
+
+	if err != nil {
+		c.AbortWithStatusJSON(err.Http_code, gin.H{
 			"data": nil,
-			"errors": obj,
-			"isSuccess": false,
+			"error": err,
+			"isSuccess": IsStatusSuccess(err.Http_code),
 			"meta": gin.H{},
 		})
 		return

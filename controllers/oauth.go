@@ -38,7 +38,7 @@ func (ctrl OauthController) TestHandler(c *gin.Context) {
 
 	log.Info().Msg(fmt.Sprintf("Got user as %v", user))
 
-	utils.AbortWithGenericJson(c, http.StatusOK, gin.H{"message": "Test resource success"})
+	utils.AbortWithGenericJson(c, utils.CreateOKResponse(&gin.H{"message": "Test resource success"}, nil), nil)
 }
 
 func (ctrl OauthController) TokenMiddleware() gin.HandlerFunc{

@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"net/http"
+	"nayanjd/docket/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -21,5 +21,6 @@ func RecoveryFunc(c *gin.Context, recovered interface{}) {
 	if err, ok := recovered.(string); ok {
 		log.Error().Msg(err)
 	}
-	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong"})
+
+	utils.AbortWithGenericJson(c, nil, &utils.InternalServerError)
 }
