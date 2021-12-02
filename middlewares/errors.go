@@ -15,7 +15,6 @@ func ErrorMiddleware() gin.HandlerFunc {
 			log.Error().Msg(c.Errors.String())
 		}
 	}
-
 }
 
 func RecoveryFunc(c *gin.Context, recovered interface{}) {

@@ -1,8 +1,11 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/manage"
 	"github.com/go-oauth2/oauth2/v4/server"
@@ -51,6 +54,31 @@ func SetupOauth() *server.Server {
 
 	srv.SetResponseErrorHandler(func(re *errors.Response) {
 		log.Error().Msg(fmt.Sprintf("Response Error: %v", re.Error.Error()))
+	})
+
+	srv.SetResponseTokenHandler(func(w http.ResponseWriter, data map[string]interface{}, header http.Header, statusCode ...int) error {
+		body := gin.H{
+			"data": data,
+			"errors": nil,
+			"isSuccess": len(statusCode) > 0 && IsStatusSuccess(statusCode[0]),
+			"meta": gin.H{},
+		}
+
+		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Header().Set("Pragma", "no-cache")
+	
+		for key := range header {
+			w.Header().Set(key, header.Get(key))
+		}
+	
+		status := http.StatusOK
+		if len(statusCode) > 0 && statusCode[0] > 0 {
+			status = statusCode[0]
+		}
+	
+		w.WriteHeader(status)
+		return json.NewEncoder(w).Encode(body)
 	})
 
 	return srv
