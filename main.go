@@ -41,7 +41,6 @@ func main() {
 
 	models.ConnectDatabase()
 
-	
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "Welcome to docket",
@@ -49,17 +48,17 @@ func main() {
 	})
 
 	oauthController := controllers.OauthController{}
-	
+
 	oauthEndpoints := r.Group("oauth")
 	{
 		oauthEndpoints.POST("/token", oauthController.TokenHandler)
 
 		oauthEndpoints.POST("/authorize", oauthController.AuthorizeHandler)
 
-		oauthEndpoints.GET("/test",oauthController.TokenMiddleware(),  oauthController.TestHandler)
+		oauthEndpoints.GET("/test", oauthController.TokenMiddleware(), oauthController.TestHandler)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	
+
 	log.Printf("Server stopped, err: %v", r.Run(":8000"))
 }
