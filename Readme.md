@@ -6,7 +6,7 @@ For dev install [this](https://github.com/codegangsta/gin) and start the server 
 gin --appPort 8000 -i
 ```
 
-The api would be available at [localhost:3000](localhost:3000)
+The api would be available at [http://localhost:3000](localhost:3000)
 
 ### Generating swagger docs
 
@@ -24,4 +24,4 @@ After you add swaggo code annotations to new controllers or modify them, run bel
 swag init
 ```
 
-The swagger docs would be available at [localhost:3000/swagger/index.html](localhost:3000/swagger/index.html)
+The swagger docs would be available at [localhost:3000/swagger/index.html](http://localhost:3000/swagger/index.html)
