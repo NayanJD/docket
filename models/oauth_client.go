@@ -17,14 +17,13 @@ import (
 
 func GenerateSecureToken(length int) string {
 	rand.Seed(time.Now().UnixNano())
-    
-	b := make([]byte, length)
-    if _, err := rand.Read(b); err != nil {
-        return ""
-    }
-    return hex.EncodeToString(b)
-}
 
+	b := make([]byte, length)
+	if _, err := rand.Read(b); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(b)
+}
 
 type ClientStore struct {
 	db                *gorm.DB
@@ -38,14 +37,14 @@ type ClientStore struct {
 // ClientStoreItem data item
 type ClientStoreItem struct {
 	gorm.Model
-	ID     string 
-	Name   string	`gorm:"not null;unique"`
-	Secret string	`gorm:"not null"`
-	Domain string 
+	ID     string
+	Name   string `gorm:"not null;unique"`
+	Secret string `gorm:"not null"`
+	Domain string
 	Data   string
 }
 
-func (u ClientStoreItem) TableName() string{
+func (u ClientStoreItem) TableName() string {
 	return "oauth2_clients"
 }
 
@@ -53,7 +52,7 @@ func (s *ClientStoreItem) String() string {
 	return fmt.Sprintf("ClientStoreItem ID: %v", s.ID)
 }
 
-func (c * ClientStoreItem) BeforeCreate(tx *gorm.DB)  (err error) {
+func (c *ClientStoreItem) BeforeCreate(tx *gorm.DB) (err error) {
 	c.ID = GenerateSecureToken(8)
 	c.Secret = GenerateSecureToken(16)
 
@@ -115,12 +114,17 @@ func (s *ClientStore) GetByID(ctx context.Context, id string) (oauth2.ClientInfo
 	clientStoreItem := ClientStoreItem{}
 
 	if err := GetDB().First(&clientStoreItem, "id = ?", id).Error; err != nil {
-		return nil, nil;
+		return nil, nil
 	}
 
 	log.Info().Msg(clientStoreItem.String())
 
-	cm := models.Client{ID: clientStoreItem.ID, Secret: clientStoreItem.Secret, Domain: clientStoreItem.Domain, UserID: clientStoreItem.Data}
+	cm := models.Client{
+		ID:     clientStoreItem.ID,
+		Secret: clientStoreItem.Secret,
+		Domain: clientStoreItem.Domain,
+		UserID: clientStoreItem.Data,
+	}
 
 	return &cm, nil
 }
@@ -133,7 +137,12 @@ func (s *ClientStore) Create(info oauth2.ClientInfo) error {
 		return err
 	}
 
-	clientStoreItem := ClientStoreItem{ID: info.GetID(), Secret: info.GetSecret(), Domain: info.GetDomain(), Data: string(data)}
+	clientStoreItem := ClientStoreItem{
+		ID:     info.GetID(),
+		Secret: info.GetSecret(),
+		Domain: info.GetDomain(),
+		Data:   string(data),
+	}
 
 	GetDB().Create(&clientStoreItem)
 

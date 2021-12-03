@@ -19,10 +19,17 @@ func getMysqlDsn() string {
 	password := os.Getenv("DB_PASSWORD")
 	database_name := os.Getenv("DB_DATABASE")
 
-	return fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?parseTime=true", username, password, host, port, database_name)
+	return fmt.Sprintf(
+		"%v:%v@tcp(%v:%v)/%v?parseTime=true",
+		username,
+		password,
+		host,
+		port,
+		database_name,
+	)
 }
 
-func GetDB() *gorm.DB{
+func GetDB() *gorm.DB {
 	return DB
 }
 
@@ -41,7 +48,7 @@ func ConnectDatabase() {
 
 	err = database.AutoMigrate(&User{})
 	database.AutoMigrate(&ClientStoreItem{})
-	
+
 	if err != nil {
 		log.Error().Err(err)
 	}

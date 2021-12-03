@@ -9,8 +9,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-
-
 func CreateOauthClient(flagSet *flag.FlagSet, commands []string) {
 	name := flagSet.String("name", "client", "Client name for the new client")
 

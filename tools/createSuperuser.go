@@ -9,8 +9,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-
-
 func CreateSuperuser(flagSet *flag.FlagSet, commands []string) {
 	firstName := flagSet.String("first-name", "first_name", "First name of user")
 	lastName := flagSet.String("last-name", "last_name", "Last name of user")
@@ -21,12 +19,12 @@ func CreateSuperuser(flagSet *flag.FlagSet, commands []string) {
 	flagSet.Parse(commands)
 
 	newUser := models.User{
-		First_name: firstName,
-		Last_name: lastName,
-		Username: username,
-		Password: password,
+		First_name:   firstName,
+		Last_name:    lastName,
+		Username:     username,
+		Password:     password,
 		Is_superuser: &isSuperuser,
-		Is_staff: &isStaff,
+		Is_staff:     &isStaff,
 	}
 
 	godotenv.Load()
