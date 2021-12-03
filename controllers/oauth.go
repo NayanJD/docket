@@ -14,13 +14,42 @@ var Srv = utils.SetupOauth()
 
 type OauthController struct{}
 
+type OauthTokenBody struct {
+	Client_id		string	`json:"client_id"`
+	Client_secret	string	`json:"client_secret"`
+	Scope			string	`json:"scope"`
+	Grant_type		string	`json:"grant_type"`
+	Username		string	`json:"username"`
+	Password		string	`json:"password"`
+}
+
+type OauthTokenData struct {
+	Access_token	string	`json:"access_token`
+	Expires_in		int		`json:"expires_in"`
+	Refresh_token	string	`json:"refresh_token"`
+	Scope			string	`json:"scope"`
+	Token_type		string	`json:"token_type"`
+}
+type OauthTokenResponse struct {
+	utils.GenericResponseBody
+	Data	OauthTokenData	`json:"data"`	
+}
+
+
+// Oauth token
+// @Summary	Get Oauth bearer token
+// @Accept	mpfd
+// @Produce json
+// @Param	grants	body	OauthTokenBody	true	"Create token"
+// @Success	200		{object}	OauthTokenResponse	"Success"
+// @Router	/oauth/token	[post]
 func (ctrl OauthController) TokenHandler(c *gin.Context) {
 	err := Srv.HandleTokenRequest(c.Writer, c.Request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Wrong password",
 		})
-	}
+	}	
 }
 
 func (ctrl OauthController) AuthorizeHandler(c *gin.Context) {

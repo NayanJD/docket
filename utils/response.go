@@ -12,6 +12,13 @@ type Response struct {
 	Meta		*gin.H
 }
 
+type GenericResponseBody struct {
+	Data		interface{}	`json:"data"`
+	Errors		[]APIError	`json:"errors"`
+	IsSuccess	bool		`json:"is_success"`
+	Meta		interface{}	`json:"meta"`
+}
+
 func IsStatusSuccess(code int) bool {
 	return code >= http.StatusOK && code < http.StatusMultipleChoices 
 }

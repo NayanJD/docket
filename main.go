@@ -8,12 +8,24 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"nayanjd/docket/controllers"
+	_ "nayanjd/docket/docs"
 	"nayanjd/docket/middlewares"
 	"nayanjd/docket/models"
 )
 
+// Swagger Annotations
+// @title           Docket API
+// @version         1.0
+// @description     This is the API for the docket app
+
+// @contact.name   Nayan Das
+// @contact.email  dastms@gmail.com
+
+// @host      localhost:8080
 func main() {
 	err := godotenv.Load()
 
@@ -46,6 +58,8 @@ func main() {
 
 		oauthEndpoints.GET("/test",oauthController.TokenMiddleware(),  oauthController.TestHandler)
 	}
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	
 	log.Printf("Server stopped, err: %v", r.Run(":8000"))
 }

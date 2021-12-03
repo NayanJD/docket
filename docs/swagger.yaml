@@ -1,0 +1,79 @@
+definitions:
+  controllers.OauthTokenBody:
+    properties:
+      client_id:
+        type: string
+      client_secret:
+        type: string
+      grant_type:
+        type: string
+      password:
+        type: string
+      scope:
+        type: string
+      username:
+        type: string
+    type: object
+  controllers.OauthTokenData:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      refresh_token:
+        type: string
+      scope:
+        type: string
+      token_type:
+        type: string
+    type: object
+  controllers.OauthTokenResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controllers.OauthTokenData'
+      errors:
+        items:
+          $ref: '#/definitions/utils.APIError'
+        type: array
+      is_success:
+        type: boolean
+      meta: {}
+    type: object
+  utils.APIError:
+    properties:
+      error_code:
+        type: string
+      error_messages:
+        items:
+          type: string
+        type: array
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: dastms@gmail.com
+    name: Nayan Das
+  description: This is the API for the docket app
+  title: Docket API
+  version: "1.0"
+paths:
+  /oauth/token:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Create token
+        in: body
+        name: grants
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.OauthTokenBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/controllers.OauthTokenResponse'
+      summary: Get Oauth bearer token
+swagger: "2.0"
