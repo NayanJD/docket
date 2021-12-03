@@ -6,7 +6,7 @@ For dev install [this](https://github.com/codegangsta/gin) and start the server 
 gin --appPort 8000 -i
 ```
 
-The api would be available at [http://localhost:3000](localhost:3000)
+The api would be available at [localhost:3000](http://localhost:3000)
 
 ### Generating swagger docs
 
