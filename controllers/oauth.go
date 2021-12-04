@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var Srv = utils.SetupOauth()
+// var Srv = utils.SetupOauth()
 
 type OauthController struct{}
 
@@ -43,7 +43,7 @@ type OauthTokenResponse struct {
 // @Success	200		{object}	OauthTokenResponse	"Success"
 // @Router	/oauth/token	[post]
 func (ctrl OauthController) TokenHandler(c *gin.Context) {
-	err := Srv.HandleTokenRequest(c.Writer, c.Request)
+	err := utils.GetSrv().HandleTokenRequest(c.Writer, c.Request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Wrong password",
@@ -52,7 +52,7 @@ func (ctrl OauthController) TokenHandler(c *gin.Context) {
 }
 
 func (ctrl OauthController) AuthorizeHandler(c *gin.Context) {
-	err := Srv.HandleAuthorizeRequest(c.Writer, c.Request)
+	err := utils.GetSrv().HandleAuthorizeRequest(c.Writer, c.Request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Wrong password",
@@ -75,7 +75,7 @@ func (ctrl OauthController) TestHandler(c *gin.Context) {
 
 func (ctrl OauthController) TokenMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenInfo, err := Srv.ValidationBearerToken(c.Request)
+		tokenInfo, err := utils.GetSrv().ValidationBearerToken(c.Request)
 
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{

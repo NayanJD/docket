@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/mysql"
@@ -40,17 +41,34 @@ func ConnectDatabase() {
 	database, err := gorm.Open(mysql.Open(mysqlDsn), &gorm.Config{})
 
 	if err != nil {
-		panic("Failed to connect to mysql")
+		log.Warn().Msg("Failed to connect to mysql")
+	} else {
+		log.Info().Msg("Successfully connected to mysql")
 	}
 
-	log.Info().Msg("Successfully connected to mysql")
-	log.Info().Msg("Test restart")
+	hasMigrationRun := false
+	shouldRunMigrationStr, envOk := os.LookupEnv("RUN_MIGRATIONS")
 
-	err = database.AutoMigrate(&User{})
-	database.AutoMigrate(&ClientStoreItem{})
+	if envOk {
+		shouldRunMigrations, err := strconv.ParseBool(shouldRunMigrationStr)
 
-	if err != nil {
-		log.Error().Err(err)
+		if err == nil && shouldRunMigrations {
+			log.Info().Msg("Running migrations")
+
+			err = database.AutoMigrate(&User{})
+			database.AutoMigrate(&ClientStoreItem{})
+
+			if err != nil {
+				log.Error().Err(err)
+			}
+
+			hasMigrationRun = true
+		}
+	}
+
+	if !hasMigrationRun {
+		log.Warn().
+			Msg("Migrations has not been run. Set RUN_MIGRATIONS env to true to run them")
 	}
 
 	DB = database
