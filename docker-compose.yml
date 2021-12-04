@@ -1,6 +1,7 @@
 services:
   api:
-    build: .
+    container_name: docket_apiserver
+    image: docket:latest
     ports:
       - "8000:8000"
     environment:
@@ -9,6 +10,7 @@ services:
     depends_on:
       - mysql
   mysql:
+    container_name: docket_mysql
     image: mysql/mysql-server:latest
     ports:
       - "3306:3306"

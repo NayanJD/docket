@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/mysql"
@@ -54,15 +55,21 @@ func ConnectDatabase() {
 
 		if err == nil && shouldRunMigrations {
 			log.Info().Msg("Running migrations")
-
-			err = database.AutoMigrate(&User{})
-			database.AutoMigrate(&ClientStoreItem{})
-
-			if err != nil {
+			log.Info().Bool("hasMigrationRun", hasMigrationRun)
+			for !hasMigrationRun {
+				log.Info().Msg("inside here")
+				err = runMigrations(database)
 				log.Error().Err(err)
+				if err != nil {
+					log.Error().Msg("There was some error while running migration")
+					log.Error().Err(err)
+					log.Info().Msg("Will try again after 30 secs")
+					time.Sleep(5 * time.Second)
+				} else {
+					log.Info().Msg("Migration was successfull.")
+					hasMigrationRun = true
+				}
 			}
-
-			hasMigrationRun = true
 		}
 	}
 
@@ -72,4 +79,15 @@ func ConnectDatabase() {
 	}
 
 	DB = database
+}
+
+func runMigrations(db *gorm.DB) error {
+	err := db.AutoMigrate(&User{})
+	db.AutoMigrate(&ClientStoreItem{})
+
+	if err != nil {
+		log.Error().Err(err)
+	}
+
+	return err
 }
