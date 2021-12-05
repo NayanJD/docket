@@ -58,6 +58,17 @@ func main() {
 		oauthEndpoints.GET("/test", oauthController.TokenMiddleware(), oauthController.TestHandler)
 	}
 
+	userController := controllers.UserController{}
+
+	userEndpoints := r.Group("user")
+	{
+		userEndpoints.POST(
+			"/register",
+			middlewares.JSONValidationMiddleware(models.User{}),
+			userController.Register,
+		)
+	}
+
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	log.Printf("Server stopped, err: %v", r.Run(":8000"))

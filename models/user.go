@@ -12,13 +12,13 @@ import (
 
 type User struct {
 	gorm.Model
-	ID           *string
-	First_name   *string `gorm:"not null"`
-	Last_name    *string `gorm:"not null"`
-	Username     *string `gorm:"not null;unique"`
-	Password     *string `gorm:"not null"`
-	Is_superuser *bool   `gorm:"not null;default:false"`
-	Is_staff     *bool   `gorm:"not null;default:false"`
+	ID           *string `json:"id"`
+	First_name   *string `json:"first_name" binding:"required" gorm:"not null"`
+	Last_name    *string `json:"last_name"  binding:"required" gorm:"not null"`
+	Username     *string `json:"username"   binding:"required" gorm:"not null;unique"`
+	Password     *string `json:"password"   binding:"required" gorm:"not null"`
+	Is_superuser *bool   `                                     gorm:"not null;default:false"`
+	Is_staff     *bool   `                                     gorm:"not null;default:false"`
 }
 
 func (u *User) String() string {

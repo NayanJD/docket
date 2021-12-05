@@ -55,11 +55,10 @@ func ConnectDatabase() {
 
 		if err == nil && shouldRunMigrations {
 			log.Info().Msg("Running migrations")
-			log.Info().Bool("hasMigrationRun", hasMigrationRun)
+
 			for !hasMigrationRun {
-				log.Info().Msg("inside here")
 				err = runMigrations(database)
-				log.Error().Err(err)
+
 				if err != nil {
 					log.Error().Msg("There was some error while running migration")
 					log.Error().Err(err)

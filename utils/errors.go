@@ -15,3 +15,11 @@ var (
 		Messages:  []string{"Something went wrong"},
 	}
 )
+
+func CreateUnprocessableEntityError(errors []string) *APIError {
+	return &APIError{
+		Code:      "UNPROCESSABLE_ENTITY",
+		Http_code: http.StatusUnprocessableEntity,
+		Messages:  errors,
+	}
+}

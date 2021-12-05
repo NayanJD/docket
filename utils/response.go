@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type Response struct {
@@ -62,4 +65,21 @@ func AbortWithGenericJson(c *gin.Context, r *Response, err *APIError) {
 		})
 		return
 	}
+}
+
+func ValidationErrorToText(e validator.FieldError) string {
+	lowerCaseField := strings.ToLower(e.Field())
+	switch e.Tag() {
+	case "required":
+		return fmt.Sprintf("%s is required", lowerCaseField)
+	case "max":
+		return fmt.Sprintf("%s cannot be longer than %s", lowerCaseField, e.Param())
+	case "min":
+		return fmt.Sprintf("%s must be longer than %s", lowerCaseField, e.Param())
+	case "email":
+		return fmt.Sprintf("Invalid email format")
+	case "len":
+		return fmt.Sprintf("%s must be %s characters long", lowerCaseField, e.Param())
+	}
+	return fmt.Sprintf("%s is not valid", lowerCaseField)
 }

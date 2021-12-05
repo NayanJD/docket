@@ -4,6 +4,7 @@ import (
 	"nayanjd/docket/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog/log"
 )
 
@@ -12,7 +13,25 @@ func ErrorMiddleware() gin.HandlerFunc {
 		c.Next()
 
 		if len(c.Errors) > 0 {
-			log.Error().Msg(c.Errors.String())
+			for _, err := range c.Errors {
+				switch err.Type {
+				case gin.ErrorTypeBind:
+					errs := err.Err.(validator.ValidationErrors)
+					list := []string{}
+					for _, err := range errs {
+						list = append(list, utils.ValidationErrorToText(err))
+					}
+
+					utils.AbortWithGenericJson(c, nil, utils.CreateUnprocessableEntityError(list))
+				default:
+					log.Error().Msg("Unknown error occurred")
+				}
+			}
+
+		}
+
+		if !c.Writer.Written() {
+			utils.AbortWithGenericJson(c, nil, &utils.InternalServerError)
 		}
 	}
 }
