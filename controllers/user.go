@@ -12,10 +12,13 @@ type UserController struct{}
 func (ctrl *UserController) Register(c *gin.Context) {
 	user := c.MustGet(gin.BindKey).(*models.User)
 
-	err := models.GetDB().Create(&user)
+	// user := models.User{}
+
+	err := models.GetDB().Create(&user).Error
 
 	if err != nil {
-
+		c.Error(err).SetType(utils.ErrorTypeDB)
+		return
 	}
 
 	utils.AbortWithGenericJson(c, utils.CreateOKResponse(&gin.H{"message": "success"}, nil), nil)

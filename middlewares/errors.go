@@ -23,6 +23,10 @@ func ErrorMiddleware() gin.HandlerFunc {
 					}
 
 					utils.AbortWithGenericJson(c, nil, utils.CreateUnprocessableEntityError(list))
+				case utils.ErrorTypeDB:
+					log.Debug().Msg("DB error occured")
+					log.Error().Msg(err.Err.Error())
+					utils.AbortWithGenericJson(c, nil, utils.CreateDbError(err.Err))
 				default:
 					log.Error().Msg("Unknown error occurred")
 				}
