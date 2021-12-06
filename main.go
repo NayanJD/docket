@@ -64,7 +64,7 @@ func main() {
 	{
 		userEndpoints.POST(
 			"/register",
-			middlewares.JSONValidationMiddleware(models.User{}),
+			middlewares.JSONValidationMiddleware(controllers.UserInputForm{}),
 			userController.Register,
 		)
 	}

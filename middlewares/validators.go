@@ -14,7 +14,7 @@ func JSONValidationMiddleware(model interface{}) gin.HandlerFunc {
 
 		obj := reflect.New(typ).Interface()
 
-		if err := c.ShouldBindJSON(obj); err != nil {
+		if err := c.ShouldBindJSON(&obj); err != nil {
 			c.Error(err).SetType(gin.ErrorTypeBind)
 			c.Abort()
 		} else {

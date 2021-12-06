@@ -11,8 +11,8 @@ import (
 
 type Response struct {
 	Http_code int
-	Body      *gin.H
-	Meta      *gin.H
+	Body      interface{}
+	Meta      interface{}
 }
 
 type GenericResponseBody struct {
@@ -26,25 +26,26 @@ func IsStatusSuccess(code int) bool {
 	return code >= http.StatusOK && code < http.StatusMultipleChoices
 }
 
-func CreateResponse(code int, body *gin.H, meta *gin.H) *Response {
+func CreateResponse(code int, body interface{}, meta interface{}) *Response {
 	return &Response{Http_code: code, Body: body, Meta: meta}
 }
 
-func CreateOKResponse(body *gin.H, meta *gin.H) *Response {
+func CreateOKResponse(body interface{}, meta interface{}) *Response {
 	return CreateResponse(http.StatusOK, body, meta)
 }
 
 func AbortWithGenericJson(c *gin.Context, r *Response, err *APIError) {
 
 	if r != nil {
-		body := gin.H{}
+		var body interface{}
+
 		if r.Body != nil {
-			body = *r.Body
+			body = r.Body
 		}
 
-		meta := gin.H{}
+		var meta interface{}
 		if r.Meta != nil {
-			meta = *r.Meta
+			meta = r.Meta
 		}
 
 		c.AbortWithStatusJSON(r.Http_code, gin.H{

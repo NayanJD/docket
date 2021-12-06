@@ -30,6 +30,7 @@ type OauthTokenData struct {
 	Scope         string `json:"scope"`
 	Token_type    string `json:"token_type"`
 }
+
 type OauthTokenResponse struct {
 	utils.GenericResponseBody
 	Data OauthTokenData `json:"data"`
@@ -68,7 +69,7 @@ func (ctrl OauthController) TestHandler(c *gin.Context) {
 
 	utils.AbortWithGenericJson(
 		c,
-		utils.CreateOKResponse(&gin.H{"message": "Test resource success"}, nil),
+		utils.CreateOKResponse(map[string]string{"message": "Test resource success"}, nil),
 		nil,
 	)
 }
