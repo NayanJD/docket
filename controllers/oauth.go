@@ -79,17 +79,13 @@ func (ctrl OauthController) TokenMiddleware() gin.HandlerFunc {
 		tokenInfo, err := utils.GetSrv().ValidationBearerToken(c.Request)
 
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"message": "You are unauthorised to view this resource",
-			})
+			utils.AbortWithGenericJson(c, nil, &utils.UnauthorisedError)
 			return
 		} else {
 			user := models.User{}
 
 			if err = models.GetDB().First(&user, "id = ?", tokenInfo.GetUserID()).Error; err != nil {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-					"message": "You are unauthorised to view this resource",
-				})
+				utils.AbortWithGenericJson(c, nil, &utils.UnauthorisedError)
 				return
 			} else {
 				c.Set(gin.AuthUserKey, user)

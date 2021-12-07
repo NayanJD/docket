@@ -39,6 +39,12 @@ var (
 		Http_code: http.StatusNoContent,
 		Messages:  []string{"The requested resource does not exists"},
 	}
+
+	UnauthorisedError = APIError{
+		Code:      "UNAUTHORISED",
+		Http_code: http.StatusUnauthorized,
+		Messages:  []string{"You are unauthorised to view this resource"},
+	}
 )
 
 func CreateUnprocessableEntityError(errors []string) *APIError {
