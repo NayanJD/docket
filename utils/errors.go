@@ -1,12 +1,14 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
 	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 )
 
 type APIError struct {
@@ -24,6 +26,18 @@ var (
 		Code:      "INTERNAL_ERROR",
 		Http_code: http.StatusInternalServerError,
 		Messages:  []string{"Something went wrong"},
+	}
+
+	PathNotFoundError = APIError{
+		Code:      "PATH_NOT_FOUND",
+		Http_code: http.StatusNotFound,
+		Messages:  []string{"The path does not exists"},
+	}
+
+	ResourceNotFoundError = APIError{
+		Code:      "RESOURCE_NOT_FOUND",
+		Http_code: http.StatusNoContent,
+		Messages:  []string{"The requested resource does not exists"},
 	}
 )
 
@@ -48,6 +62,13 @@ func CreateDbError(err error) *APIError {
 	case *mysql.MySQLError:
 		log.Debug().Msg(fmt.Sprintf("Error code: %v", v.Number))
 		return HandleMysqlError(v)
+	case error:
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Debug().Msg("Record not found")
+			return &ResourceNotFoundError
+		}
+		log.Error().Msg("Unknown db error")
+		return &InternalServerError
 	default:
 		log.Error().Msg("Unknown db error")
 		return &InternalServerError

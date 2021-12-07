@@ -45,3 +45,42 @@ func (ctrl *UserController) Register(c *gin.Context) {
 
 	utils.AbortWithGenericJson(c, utils.CreateOKResponse(newUser, nil), nil)
 }
+
+// Register Get a user
+// @Summary	Get a user
+// @Produce json
+// @Param	id	path	int64	true	"Create user"
+// @Success	200		{object}	models.User	"Success"
+// @Success	204		{}	nil	"Not found"
+// @Router	/user/:id	[get]
+func (ctrl *UserController) GetUser(c *gin.Context) {
+	userId := c.Param("id")
+
+	user := models.User{}
+
+	if err := models.GetDB().First(&user, "id = ?", userId).Error; err != nil {
+		c.Error(err).SetType(utils.ErrorTypeDB)
+		return
+	}
+
+	utils.AbortWithGenericJson(c, utils.CreateOKResponse(user, nil), nil)
+}
+
+// Register Get all users
+// @Summary	Get all users
+// @Produce json
+// @Param	id	path	int64	true	"Create user"
+// @Success	200		{object}	models.User	"Success"
+// @Success	204		{}	nil	"Not found"
+// @Router	/user/:id	[get]
+func (ctrl *UserController) GetUsers(c *gin.Context) {
+
+	users := []models.User{}
+
+	if err := models.GetDB().Find(&users).Error; err != nil {
+		c.Error(err).SetType(utils.ErrorTypeDB)
+		return
+	}
+
+	utils.AbortWithGenericJson(c, utils.CreateOKResponse(users, nil), nil)
+}

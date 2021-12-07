@@ -15,6 +15,7 @@ import (
 	_ "nayanjd/docket/docs"
 	"nayanjd/docket/middlewares"
 	"nayanjd/docket/models"
+	"nayanjd/docket/utils"
 )
 
 // Swagger Annotations
@@ -67,9 +68,15 @@ func main() {
 			middlewares.JSONValidationMiddleware(controllers.UserInputForm{}),
 			userController.Register,
 		)
+
+		userEndpoints.GET("", oauthController.TokenMiddleware(), userController.GetUsers)
+		userEndpoints.GET("/:id", oauthController.TokenMiddleware(), userController.GetUser)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.NoRoute(func(c *gin.Context) {
+		utils.AbortWithGenericJson(c, nil, &utils.PathNotFoundError)
+	})
 
 	log.Printf("Server stopped, err: %v", r.Run(":8000"))
 }

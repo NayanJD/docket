@@ -115,6 +115,26 @@ paths:
           schema:
             $ref: '#/definitions/controllers.OauthTokenResponse'
       summary: Get Oauth bearer token
+  /user/:id:
+    get:
+      parameters:
+      - description: Create user
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.User'
+        "204":
+          description: Not found
+          schema:
+            type: ""
+      summary: Get a user
   /user/register:
     post:
       consumes:
