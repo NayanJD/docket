@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 type TaskForm interface {
@@ -67,7 +68,8 @@ func (ctl *TaskController) GetUserTasks(c *gin.Context) {
 
 	tasks := []models.Task{}
 
-	if err := models.GetDB().Where("user_id = ?", user.ID).Find(&tasks).Error; err != nil {
+	log.Error().Msg("Starting query")
+	if err := models.GetDB().Preload("Tags").Where("user_id = ?", user.ID).Find(&tasks).Error; err != nil {
 		c.Error(err).SetType(utils.ErrorTypeDB)
 		return
 	}
