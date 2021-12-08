@@ -12,11 +12,13 @@ import (
 type TaskForm interface {
 	getDescription() *string
 	getScheduledFor() *time.Time
+	getTags() *[]string
 }
 
 type TaskInputForm struct {
 	Description   *string    `form:"description"   binding:"required"`
 	Scheduled_for *time.Time `form:"scheduled_for" binding:"required"`
+	Tags          *[]string  `form:"tags"`
 }
 
 func (f *TaskInputForm) getDescription() *string {
@@ -27,9 +29,14 @@ func (f *TaskInputForm) getScheduledFor() *time.Time {
 	return f.Scheduled_for
 }
 
+func (f *TaskInputForm) getTags() *[]string {
+	return f.Tags
+}
+
 type PatchTaskInputForm struct {
 	Description   *string    `form:"description"`
 	Scheduled_for *time.Time `form:"scheduled_for"`
+	Tags          *[]string  `form:"tags"`
 }
 
 func (f *PatchTaskInputForm) getDescription() *string {
@@ -39,6 +46,9 @@ func (f *PatchTaskInputForm) getDescription() *string {
 func (f *PatchTaskInputForm) getScheduledFor() *time.Time {
 	return f.Scheduled_for
 }
+func (f *PatchTaskInputForm) getTags() *[]string {
+	return f.Tags
+}
 
 type TaskController struct{}
 
@@ -47,10 +57,17 @@ func (ctrl *TaskController) Create(c *gin.Context) {
 
 	user := c.MustGet(gin.AuthUserKey).(models.User)
 
+	var tags []models.Tag
+
+	for _, name := range *taskForm.Tags {
+		tags = append(tags, models.Tag{Name: &name})
+	}
+
 	newTask := models.Task{
 		Description:   taskForm.Description,
 		Scheduled_for: taskForm.Scheduled_for,
 		UserID:        user.ID,
+		Tags:          &tags,
 	}
 
 	err := models.GetDB().Create(&newTask).Error
@@ -108,6 +125,17 @@ func (ctl *TaskController) UpdateUserTask(c *gin.Context) {
 	if err := models.GetDB().Save(&task).Error; err != nil {
 		c.Error(err).SetType(utils.ErrorTypeDB)
 		return
+	}
+
+	if taskForm.getTags() != nil {
+		var tags []models.Tag
+
+		for _, name := range *taskForm.getTags() {
+			tags = append(tags, models.Tag{Name: &name})
+		}
+
+		models.GetDB().Model(&task).Association("Tags").Replace(tags)
+		// task.Tags = &tags
 	}
 
 	utils.AbortWithGenericJson(c, utils.CreateOKResponse(task, nil), nil)
