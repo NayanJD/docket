@@ -81,8 +81,7 @@ func ConnectDatabase() {
 }
 
 func runMigrations(db *gorm.DB) error {
-	err := db.AutoMigrate(&User{})
-	db.AutoMigrate(&ClientStoreItem{})
+	err := db.AutoMigrate(&User{}, &ClientStoreItem{}, &Task{})
 
 	if err != nil {
 		log.Error().Err(err)

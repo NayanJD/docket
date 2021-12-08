@@ -12,13 +12,14 @@ import (
 
 type User struct {
 	BaseModel
-	ID           *string `json:"id"`
-	First_name   *string `json:"first_name" gorm:"not null,primarykey"`
+	ID           *string `json:"id"			gorm:"primarykey;type:varchar;size:256"`
+	First_name   *string `json:"first_name" gorm:"not null"`
 	Last_name    *string `json:"last_name"  gorm:"not null"`
 	Username     *string `json:"username"   gorm:"not null;unique"`
 	Password     *string `json:"-"          gorm:"not null"`
 	Is_superuser *bool   `json:"-"          gorm:"not null;default:false"`
 	Is_staff     *bool   `json:"-"          gorm:"not null;default:false"`
+	Tasks        []Task
 }
 
 func (u *User) String() string {

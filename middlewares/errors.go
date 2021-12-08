@@ -16,13 +16,33 @@ func ErrorMiddleware() gin.HandlerFunc {
 			for _, err := range c.Errors {
 				switch err.Type {
 				case gin.ErrorTypeBind:
-					errs := err.Err.(validator.ValidationErrors)
-					list := []string{}
-					for _, err := range errs {
-						list = append(list, utils.ValidationErrorToText(err))
+					log.Debug().Msg("Binding error occured")
+					log.Error().Msg(err.Err.Error())
+					errs, ok := err.Err.(validator.ValidationErrors)
+
+					if ok {
+						list := []string{}
+						for _, err := range errs {
+							list = append(list, utils.ValidationErrorToText(err))
+						}
+
+						utils.AbortWithGenericJson(
+							c,
+							nil,
+							utils.CreateUnprocessableEntityError(
+								list,
+							),
+						)
+					} else {
+						utils.AbortWithGenericJson(
+							c,
+							nil,
+							utils.CreateUnprocessableEntityError(
+								[]string{"Unknown error while parsing body"},
+							),
+						)
 					}
 
-					utils.AbortWithGenericJson(c, nil, utils.CreateUnprocessableEntityError(list))
 				case utils.ErrorTypeDB:
 					log.Debug().Msg("DB error occured")
 					// log.Error().Msg(err.Err.Error())

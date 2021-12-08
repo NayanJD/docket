@@ -73,6 +73,38 @@ func main() {
 		userEndpoints.GET("/:id", oauthController.TokenMiddleware(), userController.GetUser)
 	}
 
+	taskEndpoints := r.Group("task")
+	{
+		taskController := controllers.TaskController{}
+
+		taskEndpoints.POST(
+			"",
+			oauthController.TokenMiddleware(),
+			middlewares.JSONValidationMiddleware(controllers.TaskInputForm{}),
+			taskController.Create,
+		)
+
+		taskEndpoints.GET(
+			"",
+			oauthController.TokenMiddleware(),
+			taskController.GetUserTasks,
+		)
+
+		taskEndpoints.PUT(
+			"/:id",
+			oauthController.TokenMiddleware(),
+			middlewares.JSONValidationMiddleware(controllers.TaskInputForm{}),
+			taskController.UpdateUserTask,
+		)
+
+		taskEndpoints.PATCH(
+			"/:id",
+			oauthController.TokenMiddleware(),
+			middlewares.JSONValidationMiddleware(controllers.PatchTaskInputForm{}),
+			taskController.UpdateUserTask,
+		)
+	}
+
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.NoRoute(func(c *gin.Context) {
 		utils.AbortWithGenericJson(c, nil, &utils.PathNotFoundError)
