@@ -97,11 +97,23 @@ func main() {
 			taskController.UpdateUserTask,
 		)
 
+		taskEndpoints.GET(
+			"/:id",
+			oauthController.TokenMiddleware(),
+			taskController.GetUserTask,
+		)
+
 		taskEndpoints.PATCH(
 			"/:id",
 			oauthController.TokenMiddleware(),
 			middlewares.JSONValidationMiddleware(controllers.PatchTaskInputForm{}),
 			taskController.UpdateUserTask,
+		)
+
+		taskEndpoints.DELETE(
+			"/:id",
+			oauthController.TokenMiddleware(),
+			taskController.DeleteUserTask,
 		)
 	}
 

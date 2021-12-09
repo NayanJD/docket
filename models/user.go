@@ -11,6 +11,7 @@ import (
 )
 
 type User struct {
+	gorm.Model
 	BaseModel
 	ID           *string `json:"id"			gorm:"primarykey;type:varchar;size:256"`
 	First_name   *string `json:"first_name" gorm:"not null"`
@@ -19,7 +20,7 @@ type User struct {
 	Password     *string `json:"-"          gorm:"not null"`
 	Is_superuser *bool   `json:"-"          gorm:"not null;default:false"`
 	Is_staff     *bool   `json:"-"          gorm:"not null;default:false"`
-	Tasks        []Task
+	Tasks        *[]Task `gorm:"type:Task[];foreignKey:UserID;references:ID"`
 }
 
 func (u *User) String() string {
