@@ -14,8 +14,8 @@ type Task struct {
 	Scheduled_for *time.Time `json:"scheduled_for" gorm:"index"`
 	UserID        *string    `json:"user_id"       gorm:"type:varchar;size:256;not null"`
 	User          *User
-	Tags          *[]Tag `                     gorm:"many2many:task_tags;foreignKey:ID;joinForeignKey:TaskID;References:ID;joinReferences:TagID"`
-	// TagNames      *[]string `json:"tags"`
+	Tags          *[]Tag    `json:"-"             gorm:"many2many:task_tags;foreignKey:ID;joinForeignKey:TaskID;References:ID;joinReferences:TagID"`
+	TagNames      *[]string `json:"tags"          gorm:"-"`
 }
 
 func (u Task) String() string {
@@ -34,16 +34,16 @@ func (u *Task) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-// func (u *Task) AfterFind(tx *gorm.DB) (err error) {
-// 	if u.Tags != nil {
-// 		var tagNames []string
+func (u *Task) AfterFind(tx *gorm.DB) (err error) {
+	if u.Tags != nil {
+		var tagNames []string
 
-// 		for _, tag := range *u.Tags {
-// 			tagNames = append(tagNames, *tag.Name)
-// 		}
+		for _, tag := range *u.Tags {
+			tagNames = append(tagNames, *tag.Name)
+		}
 
-// 		u.TagNames = &tagNames
-// 	}
+		u.TagNames = &tagNames
+	}
 
-// 	return
-// }
+	return
+}

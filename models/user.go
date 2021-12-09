@@ -20,7 +20,7 @@ type User struct {
 	Password     *string `json:"-"          gorm:"not null"`
 	Is_superuser *bool   `json:"-"          gorm:"not null;default:false"`
 	Is_staff     *bool   `json:"-"          gorm:"not null;default:false"`
-	Tasks        *[]Task `gorm:"type:Task[];foreignKey:UserID;references:ID"`
+	Tasks        *[]Task `gorm:"foreignKey:UserID;references:ID"`
 }
 
 func (u *User) String() string {
