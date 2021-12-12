@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 )
 
 type TaskForm interface {
@@ -52,7 +51,9 @@ func (f *PatchTaskInputForm) getTags() *[]string {
 
 type TaskController struct{}
 
-func (ctrl *TaskController) Create(c *gin.Context) {
+func (ctrl *TaskController) Create(
+	c *gin.Context,
+) {
 	taskForm := c.MustGet(gin.BindKey).(*TaskInputForm)
 
 	user := c.MustGet(gin.AuthUserKey).(models.User)
@@ -60,7 +61,10 @@ func (ctrl *TaskController) Create(c *gin.Context) {
 	var tags []models.Tag
 
 	for _, name := range *taskForm.Tags {
-		tags = append(tags, models.Tag{Name: &name})
+		tags = append(
+			tags,
+			models.Tag{Name: &name},
+		)
 	}
 
 	newTask := models.Task{
@@ -77,38 +81,75 @@ func (ctrl *TaskController) Create(c *gin.Context) {
 		return
 	}
 
-	utils.AbortWithGenericJson(c, utils.CreateOKResponse(newTask, nil), nil)
+	utils.AbortWithGenericJson(
+		c,
+		utils.CreateOKResponse(newTask, nil),
+		nil,
+	)
 }
 
-func (ctl *TaskController) GetUserTasks(c *gin.Context) {
+func (ctl *TaskController) GetUserTasks(
+	c *gin.Context,
+) {
 	user := c.MustGet(gin.AuthUserKey).(models.User)
+
+	fromDate, ok := c.GetQuery("from")
+
+	if !ok {
+		fromDate = time.Unix(0, 0).Format(time.RFC3339)
+	}
+
+	toDate, ok := c.GetQuery("to")
+
+	if !ok {
+		toDate = time.Now().Format(time.RFC3339)
+	}
 
 	tasks := []models.Task{}
 
-	log.Error().Msg("Starting query")
-	if err := models.GetDB().Preload("Tags").Where("user_id = ?  and deleted_at is null", user.ID).Find(&tasks).Error; err != nil {
+	if err := models.GetDB().
+		Preload("Tags").
+		Where("user_id = ?  and deleted_at is null", user.ID).
+		Where("scheduled_for >= ? and scheduled_for <= ?", fromDate, toDate).
+		Find(&tasks).Error; err != nil {
 		c.Error(err).SetType(utils.ErrorTypeDB)
 		return
 	}
 
-	utils.AbortWithGenericJson(c, utils.CreateOKResponse(tasks, nil), nil)
+	utils.AbortWithGenericJson(
+		c,
+		utils.CreateOKResponse(tasks, nil),
+		nil,
+	)
 }
 
-func (ctl *TaskController) GetUserTask(c *gin.Context) {
+func (ctl *TaskController) GetUserTask(
+	c *gin.Context,
+) {
 	user := c.MustGet(gin.AuthUserKey).(models.User)
 
 	taskId := c.Param("id")
+
 	task := []models.Task{}
 
-	if err := models.GetDB().Preload("Tags").Where("user_id = ? and id = ?  and deleted_at is null", user.ID, taskId).First(&task).Error; err != nil {
+	if err := models.GetDB().Preload("Tags").
+		Where("user_id = ? and id = ?  and deleted_at is null", user.ID, taskId).
+		First(&task).
+		Error; err != nil {
 		c.Error(err).SetType(utils.ErrorTypeDB)
 		return
 	}
 
-	utils.AbortWithGenericJson(c, utils.CreateOKResponse(task, nil), nil)
+	utils.AbortWithGenericJson(
+		c,
+		utils.CreateOKResponse(task, nil),
+		nil,
+	)
 }
 
-func (ctl *TaskController) UpdateUserTask(c *gin.Context) {
+func (ctl *TaskController) UpdateUserTask(
+	c *gin.Context,
+) {
 	var taskForm TaskForm
 
 	taskForm, ok := c.MustGet(gin.BindKey).(*TaskInputForm)
@@ -123,7 +164,9 @@ func (ctl *TaskController) UpdateUserTask(c *gin.Context) {
 
 	task := models.Task{}
 
-	if err := models.GetDB().Where("user_id = ? and id = ? and deleted_at is null", user.ID, taskId).First(&task).Error; err != nil {
+	if err := models.GetDB().
+		Where("user_id = ? and id = ? and deleted_at is null", user.ID, taskId).
+		First(&task).Error; err != nil {
 		c.Error(err).SetType(utils.ErrorTypeDB)
 		return
 	}
@@ -145,16 +188,28 @@ func (ctl *TaskController) UpdateUserTask(c *gin.Context) {
 		var tags []models.Tag
 
 		for _, name := range *taskForm.getTags() {
-			tags = append(tags, models.Tag{Name: &name})
+			tags = append(
+				tags,
+				models.Tag{Name: &name},
+			)
 		}
 
-		models.GetDB().Model(&task).Association("Tags").Replace(tags)
+		models.GetDB().
+			Model(&task).
+			Association("Tags").
+			Replace(tags)
 	}
 
-	utils.AbortWithGenericJson(c, utils.CreateOKResponse(task, nil), nil)
+	utils.AbortWithGenericJson(
+		c,
+		utils.CreateOKResponse(task, nil),
+		nil,
+	)
 }
 
-func (ctl *TaskController) DeleteUserTask(c *gin.Context) {
+func (ctl *TaskController) DeleteUserTask(
+	c *gin.Context,
+) {
 
 	taskId := c.Param("id")
 
@@ -162,7 +217,9 @@ func (ctl *TaskController) DeleteUserTask(c *gin.Context) {
 
 	task := models.Task{}
 
-	if err := models.GetDB().Where("user_id = ? and id = ? and deleted_at is null", user.ID, taskId).First(&task).Error; err != nil {
+	if err := models.GetDB().
+		Where("user_id = ? and id = ? and deleted_at is null", user.ID, taskId).
+		First(&task).Error; err != nil {
 		c.Error(err).SetType(utils.ErrorTypeDB)
 		return
 	}
@@ -176,5 +233,9 @@ func (ctl *TaskController) DeleteUserTask(c *gin.Context) {
 		return
 	}
 
-	utils.AbortWithGenericJson(c, utils.CreateOKResponse(task, nil), nil)
+	utils.AbortWithGenericJson(
+		c,
+		utils.CreateOKResponse(task, nil),
+		nil,
+	)
 }
