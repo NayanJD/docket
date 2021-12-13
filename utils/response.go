@@ -12,29 +12,40 @@ import (
 type Response struct {
 	Http_code int
 	Body      interface{}
-	Meta      interface{}
+	Meta      map[string]interface{}
 }
 
 type GenericResponseBody struct {
-	Data      interface{} `json:"data"`
-	Errors    []APIError  `json:"errors"`
-	IsSuccess bool        `json:"is_success"`
-	Meta      interface{} `json:"meta"`
+	Data      interface{}            `json:"data"`
+	Errors    []APIError             `json:"errors"`
+	IsSuccess bool                   `json:"is_success"`
+	Meta      map[string]interface{} `json:"meta"`
 }
 
 func IsStatusSuccess(code int) bool {
 	return code >= http.StatusOK && code < http.StatusMultipleChoices
 }
 
-func CreateResponse(code int, body interface{}, meta interface{}) *Response {
+func CreateResponse(
+	code int,
+	body interface{},
+	meta map[string]interface{},
+) *Response {
 	return &Response{Http_code: code, Body: body, Meta: meta}
 }
 
-func CreateOKResponse(body interface{}, meta interface{}) *Response {
+func CreateOKResponse(
+	body interface{},
+	meta map[string]interface{},
+) *Response {
 	return CreateResponse(http.StatusOK, body, meta)
 }
 
-func AbortWithGenericJson(c *gin.Context, r *Response, err *APIError) {
+func AbortWithGenericJson(
+	c *gin.Context,
+	r *Response,
+	err *APIError,
+) {
 
 	if r != nil {
 		var body interface{}
@@ -74,13 +85,25 @@ func ValidationErrorToText(e validator.FieldError) string {
 	case "required":
 		return fmt.Sprintf("%s is required", lowerCaseField)
 	case "max":
-		return fmt.Sprintf("%s cannot be longer than %s", lowerCaseField, e.Param())
+		return fmt.Sprintf(
+			"%s cannot be longer than %s",
+			lowerCaseField,
+			e.Param(),
+		)
 	case "min":
-		return fmt.Sprintf("%s must be longer than %s", lowerCaseField, e.Param())
+		return fmt.Sprintf(
+			"%s must be longer than %s",
+			lowerCaseField,
+			e.Param(),
+		)
 	case "email":
 		return fmt.Sprintf("Invalid email format")
 	case "len":
-		return fmt.Sprintf("%s must be %s characters long", lowerCaseField, e.Param())
+		return fmt.Sprintf(
+			"%s must be %s characters long",
+			lowerCaseField,
+			e.Param(),
+		)
 	}
 	return fmt.Sprintf("%s is not valid", lowerCaseField)
 }

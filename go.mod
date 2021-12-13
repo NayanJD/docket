@@ -9,7 +9,7 @@ require (
 	github.com/go-oauth2/mysql/v4 v4.0.0
 	github.com/go-oauth2/oauth2/v4 v4.4.2
 	github.com/go-openapi/spec v0.20.4 // indirect
-	github.com/go-playground/validator/v10 v10.4.1
+	github.com/go-playground/validator/v10 v10.9.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect

@@ -107,18 +107,32 @@ func (ctl *TaskController) GetUserTasks(
 
 	tasks := []models.Task{}
 
-	if err := models.GetDB().
+	query := models.GetDB().
+		Model(&models.Task{}).
 		Preload("Tags").
 		Where("user_id = ?  and deleted_at is null", user.ID).
-		Where("scheduled_for >= ? and scheduled_for <= ?", fromDate, toDate).
-		Find(&tasks).Error; err != nil {
+		Where("scheduled_for >= ? and scheduled_for <= ?", fromDate, toDate)
+
+	_, paginationMeta, err := utils.GetPagination(
+		c,
+		query,
+	)
+
+	if err != nil {
+		return
+	}
+
+	if err := query.Find(&tasks).Error; err != nil {
 		c.Error(err).SetType(utils.ErrorTypeDB)
 		return
 	}
 
 	utils.AbortWithGenericJson(
 		c,
-		utils.CreateOKResponse(tasks, nil),
+		utils.CreateOKResponse(
+			tasks,
+			map[string]interface{}{"pagination": paginationMeta},
+		),
 		nil,
 	)
 }
