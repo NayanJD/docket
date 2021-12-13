@@ -18,7 +18,7 @@ type TaskForm interface {
 type TaskInputForm struct {
 	Description   *string    `form:"description"   binding:"required"`
 	Scheduled_for *time.Time `form:"scheduled_for" binding:"required"`
-	Tags          *[]string  `form:"tags"		   binding:"required"`
+	Tags          *[]string  `form:"tags"          binding:"required"`
 }
 
 type TaskListQueryParam struct {

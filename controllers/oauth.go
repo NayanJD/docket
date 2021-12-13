@@ -24,7 +24,7 @@ type OauthTokenBody struct {
 }
 
 type OauthTokenData struct {
-	Access_token  string `json:"access_token`
+	Access_token  string `json:"access_token"`
 	Expires_in    int    `json:"expires_in"`
 	Refresh_token string `json:"refresh_token"`
 	Scope         string `json:"scope"`
@@ -69,17 +69,25 @@ func (ctrl OauthController) TestHandler(c *gin.Context) {
 
 	utils.AbortWithGenericJson(
 		c,
-		utils.CreateOKResponse(map[string]string{"message": "Test resource success"}, nil),
+		utils.CreateOKResponse(
+			map[string]string{"message": "Test resource success"},
+			nil,
+		),
 		nil,
 	)
 }
 
 func (ctrl OauthController) TokenMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenInfo, err := utils.GetSrv().ValidationBearerToken(c.Request)
+		tokenInfo, err := utils.GetSrv().
+			ValidationBearerToken(c.Request)
 
 		if err != nil {
-			utils.AbortWithGenericJson(c, nil, &utils.UnauthorisedError)
+			utils.AbortWithGenericJson(
+				c,
+				nil,
+				&utils.UnauthorisedError,
+			)
 			return
 		} else {
 			user := models.User{}

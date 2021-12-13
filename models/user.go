@@ -13,14 +13,14 @@ import (
 type User struct {
 	gorm.Model
 	BaseModel
-	ID           *string `json:"id"			gorm:"primarykey;type:varchar;size:256"`
+	ID           *string `json:"id"         gorm:"primarykey;type:varchar;size:256"`
 	First_name   *string `json:"first_name" gorm:"not null"`
 	Last_name    *string `json:"last_name"  gorm:"not null"`
 	Username     *string `json:"username"   gorm:"not null;unique"`
 	Password     *string `json:"-"          gorm:"not null"`
 	Is_superuser *bool   `json:"-"          gorm:"not null;default:false"`
 	Is_staff     *bool   `json:"-"          gorm:"not null;default:false"`
-	Tasks        *[]Task `gorm:"foreignKey:UserID;references:ID"`
+	Tasks        *[]Task `                  gorm:"foreignKey:UserID;references:ID"`
 }
 
 func (u *User) String() string {
@@ -42,7 +42,10 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 
 	if u.Password != nil {
-		hash, err := bcrypt.GenerateFromPassword([]byte(*u.Password), bcrypt.MinCost)
+		hash, err := bcrypt.GenerateFromPassword(
+			[]byte(*u.Password),
+			bcrypt.MinCost,
+		)
 
 		if err != nil {
 			return err
@@ -66,7 +69,10 @@ func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
 	}
 
 	if tx.Statement.Changed("Password") {
-		hash, err := bcrypt.GenerateFromPassword([]byte(*u.Password), bcrypt.MinCost)
+		hash, err := bcrypt.GenerateFromPassword(
+			[]byte(*u.Password),
+			bcrypt.MinCost,
+		)
 
 		if err != nil {
 			return err
@@ -79,7 +85,10 @@ func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
 }
 
 func (u *User) ComparePassword(pwd *string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(*u.Password), []byte(*pwd))
+	err := bcrypt.CompareHashAndPassword(
+		[]byte(*u.Password),
+		[]byte(*pwd),
+	)
 
 	if err != nil {
 		log.Error().Err(err)

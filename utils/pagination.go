@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -12,11 +11,11 @@ import (
 
 type Pagination struct {
 	Page_number *int    `form:"page_number" json:"page_number" validate:"gte=1"`
-	Page_size   *int    `form:"page_size" 	json:"page_size"   validate:"gte=1"`
+	Page_size   *int    `form:"page_size"   json:"page_size"   validate:"gte=1"`
 	Sort_column *string `form:"sort_column" json:"-"`
-	Sort_order  *string `form:"order"       json:"-"			validate:"asc | ASC | desc | DESC"`
-	Pages       *int64  `form:"-" json:"pages"`
-	Count       *int64  `form:"-" json:"count"`
+	Sort_order  *string `form:"order"       json:"-"           validate:"asc | ASC | desc | DESC"`
+	Pages       *int64  `form:"-"           json:"pages"`
+	Count       *int64  `form:"-"           json:"count"`
 }
 
 type PaginationMeta struct {
@@ -90,32 +89,4 @@ func GetPagination(
 			Offset(offset).
 			Order(order),
 		&pagination, nil
-}
-
-func takeSliceArg(arg interface{}) (out []interface{}, ok bool) {
-	slice, success := takeArg(arg, reflect.Slice)
-	if !success {
-		ok = false
-		return
-	}
-	c := slice.Len()
-	out = make([]interface{}, c)
-	for i := 0; i < c; i++ {
-		modelValue := reflect.ValueOf(slice.Index(i))
-		typ := modelValue.Type()
-		obj := reflect.New(typ).Interface()
-		out[i] = obj
-	}
-	return out, true
-}
-
-func takeArg(
-	arg interface{},
-	kind reflect.Kind,
-) (val reflect.Value, ok bool) {
-	val = reflect.ValueOf(arg)
-	if val.Kind() == kind {
-		ok = true
-	}
-	return
 }
