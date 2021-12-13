@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type TaskForm interface {
@@ -18,6 +19,44 @@ type TaskInputForm struct {
 	Description   *string    `form:"description"   binding:"required"`
 	Scheduled_for *time.Time `form:"scheduled_for" binding:"required"`
 	Tags          *[]string  `form:"tags"		   binding:"required"`
+}
+
+type TaskListQueryParam struct {
+	From *time.Time `form:"from"`
+	To   *time.Time `form:"to"`
+}
+
+func getValidate() *validator.Validate {
+	validate := validator.New()
+
+	validate.RegisterStructValidation(func(sl validator.StructLevel) {
+		taskListQueryParam := sl.Current().Interface().(TaskListQueryParam)
+
+		fromTime := taskListQueryParam.From
+		toTime := taskListQueryParam.To
+
+		if fromTime != nil &&
+			toTime != nil &&
+			fromTime.After(*toTime) {
+			sl.ReportError(
+				taskListQueryParam.From,
+				"from",
+				"From",
+				"fromto",
+				"",
+			)
+			sl.ReportError(
+				taskListQueryParam.To,
+				"to",
+				"To",
+				"fromto",
+				"",
+			)
+
+		}
+	}, TaskListQueryParam{})
+
+	return validate
 }
 
 func (f *TaskInputForm) getDescription() *string {
@@ -93,25 +132,40 @@ func (ctl *TaskController) GetUserTasks(
 ) {
 	user := c.MustGet(gin.AuthUserKey).(models.User)
 
-	fromDate, ok := c.GetQuery("from")
+	queryParam := TaskListQueryParam{}
 
-	if !ok {
-		fromDate = time.Unix(0, 0).Format(time.RFC3339)
+	if err := c.ShouldBindQuery(&queryParam); err != nil {
+		c.Error(err).SetType(gin.ErrorTypeBind)
+		return
+	} else {
+		validate := getValidate()
+
+		if err := validate.Struct(&queryParam); err != nil {
+			c.Error(err).SetType(gin.ErrorTypeBind)
+			return
+		}
 	}
 
-	toDate, ok := c.GetQuery("to")
+	if queryParam.From == nil {
+		epochTime := time.Unix(0, 0)
+		queryParam.From = &epochTime
+	}
 
-	if !ok {
-		toDate = time.Now().Format(time.RFC3339)
+	if queryParam.To == nil {
+		nowTime := time.Now()
+		queryParam.To = &nowTime
 	}
 
 	tasks := []models.Task{}
+
+	fromString := queryParam.From.Format(time.RFC3339)
+	toString := queryParam.To.Format(time.RFC3339)
 
 	query := models.GetDB().
 		Model(&models.Task{}).
 		Preload("Tags").
 		Where("user_id = ?  and deleted_at is null", user.ID).
-		Where("scheduled_for >= ? and scheduled_for <= ?", fromDate, toDate)
+		Where("scheduled_for >= ? and scheduled_for <= ?", fromString, toString)
 
 	_, paginationMeta, err := utils.GetPagination(
 		c,

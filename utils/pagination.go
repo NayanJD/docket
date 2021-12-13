@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
@@ -38,6 +39,13 @@ func GetPagination(
 	if err := c.ShouldBindQuery(&pagination); err != nil {
 		c.Error(err).SetType(gin.ErrorTypeBind)
 		return nil, nil, err
+	} else {
+		validate := validator.New()
+
+		if err := validate.Struct(&pagination); err != nil {
+			c.Error(err).SetType(gin.ErrorTypeBind)
+			return nil, nil, err
+		}
 	}
 
 	if pagination.Sort_column == nil {
