@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	ginzerolog "github.com/dn365/gin-zerolog"
@@ -54,9 +55,16 @@ func main() {
 	{
 		oauthEndpoints.POST("/token", oauthController.TokenHandler)
 
-		oauthEndpoints.POST("/authorize", oauthController.AuthorizeHandler)
+		oauthEndpoints.POST(
+			"/authorize",
+			oauthController.AuthorizeHandler,
+		)
 
-		oauthEndpoints.GET("/test", oauthController.TokenMiddleware(), oauthController.TestHandler)
+		oauthEndpoints.GET(
+			"/test",
+			oauthController.TokenMiddleware(),
+			oauthController.TestHandler,
+		)
 	}
 
 	userController := controllers.UserController{}
@@ -65,12 +73,22 @@ func main() {
 	{
 		userEndpoints.POST(
 			"/register",
-			middlewares.JSONValidationMiddleware(controllers.UserInputForm{}),
+			middlewares.JSONValidationMiddleware(
+				controllers.UserInputForm{},
+			),
 			userController.Register,
 		)
 
-		userEndpoints.GET("", oauthController.TokenMiddleware(), userController.GetUsers)
-		userEndpoints.GET("/:id", oauthController.TokenMiddleware(), userController.GetUser)
+		userEndpoints.GET(
+			"",
+			oauthController.TokenMiddleware(),
+			userController.GetUsers,
+		)
+		userEndpoints.GET(
+			"/:id",
+			oauthController.TokenMiddleware(),
+			userController.GetUser,
+		)
 	}
 
 	taskEndpoints := r.Group("task")
@@ -80,7 +98,9 @@ func main() {
 		taskEndpoints.POST(
 			"",
 			oauthController.TokenMiddleware(),
-			middlewares.JSONValidationMiddleware(controllers.TaskInputForm{}),
+			middlewares.JSONValidationMiddleware(
+				controllers.TaskInputForm{},
+			),
 			taskController.Create,
 		)
 
@@ -93,7 +113,9 @@ func main() {
 		taskEndpoints.PUT(
 			"/:id",
 			oauthController.TokenMiddleware(),
-			middlewares.JSONValidationMiddleware(controllers.TaskInputForm{}),
+			middlewares.JSONValidationMiddleware(
+				controllers.TaskInputForm{},
+			),
 			taskController.UpdateUserTask,
 		)
 
@@ -106,7 +128,9 @@ func main() {
 		taskEndpoints.PATCH(
 			"/:id",
 			oauthController.TokenMiddleware(),
-			middlewares.JSONValidationMiddleware(controllers.PatchTaskInputForm{}),
+			middlewares.JSONValidationMiddleware(
+				controllers.PatchTaskInputForm{},
+			),
 			taskController.UpdateUserTask,
 		)
 
@@ -117,10 +141,20 @@ func main() {
 		)
 	}
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET(
+		"/swagger/*any",
+		ginSwagger.WrapHandler(swaggerFiles.Handler),
+	)
 	r.NoRoute(func(c *gin.Context) {
 		utils.AbortWithGenericJson(c, nil, &utils.PathNotFoundError)
 	})
 
-	log.Printf("Server stopped, err: %v", r.Run(":8000"))
+	port, ok := os.LookupEnv("PORT")
+
+	fmt.Println("port", port)
+	if !ok {
+		port = "8000"
+	}
+
+	log.Printf("Server stopped, err: %v", r.Run(":"+port))
 }
