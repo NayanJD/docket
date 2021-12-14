@@ -12,7 +12,7 @@ import (
 
 type User struct {
 	BaseModel
-	ID           *string `json:"id"         gorm:"primarykey;type:varchar;size:256"`
+	ID           *string `json:"id"         gorm:"primarykey;type:varchar(256);"`
 	First_name   *string `json:"first_name" gorm:"not null"`
 	Last_name    *string `json:"last_name"  gorm:"not null"`
 	Username     *string `json:"username"   gorm:"not null;unique"`
