@@ -41,6 +41,13 @@ func CreateOKResponse(
 	return CreateResponse(http.StatusOK, body, meta)
 }
 
+func CreateCreateResponse(
+	body interface{},
+	meta map[string]interface{},
+) *Response {
+	return CreateResponse(http.StatusCreated, body, meta)
+}
+
 func AbortWithGenericJson(
 	c *gin.Context,
 	r *Response,

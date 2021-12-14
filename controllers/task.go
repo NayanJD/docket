@@ -90,6 +90,13 @@ func (f *PatchTaskInputForm) getTags() *[]string {
 
 type TaskController struct{}
 
+// Register Create task for authenticated user
+// @Summary	Create task for authenticated user
+// @Accept	json
+// @Produce json
+// @Param	newTask	body	TaskInputForm	true	"Create task"
+// @Success	201		{object}	models.Task	"Success"
+// @Router	/task	[post]
 func (ctrl *TaskController) Create(
 	c *gin.Context,
 ) {
@@ -122,11 +129,22 @@ func (ctrl *TaskController) Create(
 
 	utils.AbortWithGenericJson(
 		c,
-		utils.CreateOKResponse(newTask, nil),
+		utils.CreateCreateResponse(newTask, nil),
 		nil,
 	)
 }
 
+// Register Get tasks for authenticated user
+// @Summary	Get tasks for authenticated user
+// @Produce json
+// @Param	from_datetime	query	string	false	"From date"
+// @Param	to_datetime	query	string	false	"To date"
+// @Param	sort_column	query	string	false	"Sort Column"
+// @Param	page_size	query	int	false	"Page Size"
+// @Param	order	query	string	false	"Order"
+// @Param	page_number	query	int	false	"Page Number"
+// @Success	200	{object}	[]models.Task	"Success"
+// @Router	/task	[get]
 func (ctl *TaskController) GetUserTasks(
 	c *gin.Context,
 ) {

@@ -37,7 +37,24 @@ definitions:
         type: array
       is_success:
         type: boolean
-      meta: {}
+      meta:
+        additionalProperties: true
+        type: object
+    type: object
+  controllers.TaskInputForm:
+    properties:
+      description:
+        type: string
+      scheduled_for:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    required:
+    - description
+    - scheduled_for
+    - tags
     type: object
   controllers.UserInputForm:
     properties:
@@ -61,6 +78,27 @@ definitions:
     - password
     - username
     type: object
+  models.Task:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      scheduled_for:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
   models.User:
     properties:
       created_at:
@@ -73,6 +111,10 @@ definitions:
         type: string
       last_name:
         type: string
+      tasks:
+        items:
+          $ref: '#/definitions/models.Task'
+        type: array
       updated_at:
         type: string
       username:
@@ -115,6 +157,61 @@ paths:
           schema:
             $ref: '#/definitions/controllers.OauthTokenResponse'
       summary: Get Oauth bearer token
+  /task:
+    get:
+      parameters:
+      - description: From date
+        in: query
+        name: from_datetime
+        type: string
+      - description: To date
+        in: query
+        name: to_datetime
+        type: string
+      - description: Sort Column
+        in: query
+        name: sort_column
+        type: string
+      - description: Page Size
+        in: query
+        name: page_size
+        type: integer
+      - description: Order
+        in: query
+        name: order
+        type: string
+      - description: Page Number
+        in: query
+        name: page_number
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            items:
+              $ref: '#/definitions/models.Task'
+            type: array
+      summary: Get tasks for authenticated user
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create task
+        in: body
+        name: newTask
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.TaskInputForm'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: Create task for authenticated user
   /user/:id:
     get:
       parameters:
@@ -134,7 +231,7 @@ paths:
           description: Not found
           schema:
             type: ""
-      summary: Get a user
+      summary: Get all users
   /user/register:
     post:
       consumes:

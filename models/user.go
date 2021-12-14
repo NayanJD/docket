@@ -11,7 +11,6 @@ import (
 )
 
 type User struct {
-	gorm.Model
 	BaseModel
 	ID           *string `json:"id"         gorm:"primarykey;type:varchar;size:256"`
 	First_name   *string `json:"first_name" gorm:"not null"`

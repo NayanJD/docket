@@ -56,12 +56,97 @@ var doc = `{
                 }
             }
         },
+        "/task": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get tasks for authenticated user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "From date",
+                        "name": "from_datetime",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "To date",
+                        "name": "to_datetime",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort Column",
+                        "name": "sort_column",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page Size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Order",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page Number",
+                        "name": "page_number",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Task"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create task for authenticated user",
+                "parameters": [
+                    {
+                        "description": "Create task",
+                        "name": "newTask",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.TaskInputForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    }
+                }
+            }
+        },
         "/user/:id": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get a user",
+                "summary": "Get all users",
                 "parameters": [
                     {
                         "type": "integer",
@@ -177,7 +262,32 @@ var doc = `{
                 "is_success": {
                     "type": "boolean"
                 },
-                "meta": {}
+                "meta": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "controllers.TaskInputForm": {
+            "type": "object",
+            "required": [
+                "description",
+                "scheduled_for",
+                "tags"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "scheduled_for": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
             }
         },
         "controllers.UserInputForm": {
@@ -212,6 +322,38 @@ var doc = `{
                 }
             }
         },
+        "models.Task": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "scheduled_for": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "models.User": {
             "type": "object",
             "properties": {
@@ -229,6 +371,12 @@ var doc = `{
                 },
                 "last_name": {
                     "type": "string"
+                },
+                "tasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Task"
+                    }
                 },
                 "updated_at": {
                     "type": "string"
