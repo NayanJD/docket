@@ -1,7 +1,9 @@
 setup:
   addons:
-    - plan: heroku-mysql
+    - plan: jawsdb:kitefin
       as: DATABASE
+    - plan: papertrail:choklad
+      as: LOGGING
 build:
   docker:
     web: Dockerfile
