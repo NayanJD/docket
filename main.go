@@ -7,6 +7,7 @@ import (
 	ginzerolog "github.com/dn365/gin-zerolog"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	cors "github.com/rs/cors/wrapper/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
@@ -40,6 +41,7 @@ func main() {
 	r.Use(ginzerolog.Logger("gin"))
 	r.Use(middlewares.ErrorMiddleware())
 	r.Use(gin.CustomRecovery(middlewares.RecoveryFunc))
+	r.Use(cors.Default())
 
 	models.ConnectDatabase()
 
