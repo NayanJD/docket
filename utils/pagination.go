@@ -13,7 +13,7 @@ type Pagination struct {
 	Page_number *int    `form:"page_number" json:"page_number" validate:"gte=1"`
 	Page_size   *int    `form:"page_size"   json:"page_size"   validate:"gte=1"`
 	Sort_column *string `form:"sort_column" json:"-"`
-	Sort_order  *string `form:"order"       json:"-"           validate:"asc | ASC | desc | DESC"`
+	Sort_order  *string `form:"order"       json:"-"           validate:oneof="asc" "ASC" "desc" "DESC"`
 	Pages       *int64  `form:"-"           json:"pages"`
 	Count       *int64  `form:"-"           json:"count"`
 }

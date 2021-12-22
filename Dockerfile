@@ -16,8 +16,6 @@ ADD ./.profile.d /app/.profile.d
 
 COPY . /go/src
 
-
-
 RUN go mod download
 
 RUN go build
