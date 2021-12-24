@@ -41,7 +41,7 @@ func main() {
 	r.Use(ginzerolog.Logger("gin"))
 	r.Use(middlewares.ErrorMiddleware())
 	r.Use(gin.CustomRecovery(middlewares.RecoveryFunc))
-	r.Use(cors.Default())
+	r.Use(cors.AllowAll())
 
 	models.ConnectDatabase()
 
